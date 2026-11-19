@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="ko"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>activewith.net</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+:root{
+  --bg:#f6f7f9; --panel:#fff; --ink:#15181d; --sub:#5b6472; --line:#e3e6eb;
+  --accent:#1f6feb; --accent-soft:#e8f0fe;
+  --ok:#1a7f37; --ok-soft:#dafbe1; --warn:#9a6700; --warn-soft:#fff8c5;
+  --off:#6e7781; --off-soft:#eaeef2; --bad:#cf222e; --bad-soft:#ffebe9;
+  --radius:12px;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#0f1115;--panel:#171a21;--ink:#e6e9ef;--sub:#9aa3b2;--line:#2a2f3a;
+  --accent:#4c8dff;--accent-soft:#1b2740;--ok:#4ac26b;--ok-soft:#14301d;--warn:#d4a72c;--warn-soft:#332a10;
+  --off:#8b949e;--off-soft:#242a33;--bad:#ff7b72;--bad-soft:#3a1a1a;}
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Pretendard,-apple-system,"Malgun Gothic",sans-serif;font-size:15px;line-height:1.5}
+a{color:var(--accent);text-decoration:none}
+.wrap{max-width:1160px;margin:0 auto;padding:28px 20px 60px}
+header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+header h1{margin:0;font-size:26px;letter-spacing:-.02em}
+header p{margin:4px 0 0;color:var(--sub)}
+.stats{display:flex;gap:8px;flex-wrap:wrap}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 12px;min-width:84px}
+.stat b{display:block;font-size:18px}
+.stat span{font-size:12px;color:var(--sub)}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:10px;margin-bottom:16px;position:sticky;top:8px;z-index:5}
+.toolbar input[type=search]{flex:1 1 220px;min-width:180px}
+input,select,textarea{font:inherit;color:inherit;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+textarea{width:100%;resize:vertical}
+button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:8px 12px}
+button:hover{border-color:var(--accent)}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+button.danger{color:var(--bad)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;border-radius:0}
+.seg button.on{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.spacer{flex:1}
+.manage-only{display:none}
+body.manage .manage-only{display:inline-flex}
+body.manage .manage-only.block{display:block}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;gap:10px;transition:border-color .15s, transform .15s}
+.card:hover{border-color:var(--accent);transform:translateY(-1px)}
+.card.hidden-app{opacity:.55;border-style:dashed}
+.card-top{display:flex;gap:12px;align-items:flex-start}
+.icon{width:44px;height:44px;border-radius:10px;background:var(--accent-soft);display:grid;place-items:center;font-size:22px;flex:none}
+.card h3{margin:0;font-size:16px;letter-spacing:-.01em}
+.card .url{font-size:12.5px;color:var(--sub);word-break:break-all}
+.card .desc{margin:0;color:var(--sub);font-size:14px;flex:1}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-size:12px;padding:2px 8px;border-radius:999px;background:var(--off-soft);color:var(--off);white-space:nowrap}
+.st-운영중{background:var(--ok-soft);color:var(--ok)}
+.st-개발중{background:var(--warn-soft);color:var(--warn)}
+.st-중지{background:var(--off-soft);color:var(--off)}
+.st-주소미입력{background:var(--bad-soft);color:var(--bad)}
+.card-actions{display:flex;gap:6px;align-items:center}
+.card-actions .go{flex:1;text-align:center;background:var(--accent);color:#fff;border-radius:8px;padding:8px}
+.card-actions .go.disabled{background:var(--off-soft);color:var(--off);pointer-events:none}
+.health{font-size:12px;color:var(--sub)}
+.health.up{color:var(--ok)} .health.down{color:var(--bad)}
+
+.table-wrap{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:auto}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;white-space:nowrap}
+td.wrapcell{white-space:normal;min-width:200px}
+th{position:sticky;top:0;background:var(--panel);font-weight:600;color:var(--sub);cursor:pointer;user-select:none}
+th.sorted::after{content:attr(data-dir);margin-left:4px}
+tr:hover td{background:var(--bg)}
+.mono{font-family:ui-monospace,Consolas,monospace;font-size:12.5px}
+.empty{padding:40px;text-align:center;color:var(--sub);background:var(--panel);border:1px dashed var(--line);border-radius:var(--radius)}
+
+.notice{background:var(--warn-soft);color:var(--warn);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:13.5px}
+dialog{border:1px solid var(--line);border-radius:14px;padding:0;background:var(--panel);color:var(--ink);width:min(620px,94vw)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+.dlg-head{padding:16px 20px;border-bottom:1px solid var(--line);font-weight:700}
+.dlg-body{padding:16px 20px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.dlg-body label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--sub)}
+.dlg-body label.full{grid-column:1/-1}
+.dlg-body label.check{flex-direction:row;align-items:center;gap:8px}
+.dlg-foot{padding:12px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end}
+footer{margin-top:36px;color:var(--sub);font-size:12.5px;text-align:center}
+@media (max-width:560px){.dlg-body{grid-template-columns:1fr}.toolbar{position:static}}
+
+#gate{position:fixed;inset:0;background:var(--bg);display:grid;place-items:center;z-index:50;padding:20px}
+#gate .box{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:28px;width:min(380px,100%);display:flex;flex-direction:column;gap:12px}
+#gate h2{margin:0;font-size:20px}
+#gate p{margin:0;color:var(--sub);font-size:13.5px}
+#gate input[type=password]{width:100%;font-size:16px;padding:10px 12px}
+#gate .row{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--sub)}
+#gate .err{color:var(--bad);font-size:13px;min-height:18px}
+#gate button.primary{padding:10px}
+body.locked .wrap{display:none}
+</style>
+</head>
+<body class="locked">
+<div id="gate"><div class="box" id="gateBox"></div></div>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>activewith.net</h1>
+      <p>운영 중인 앱·게임 목록</p>
+    </div>
+    <div class="stats" id="stats"></div>
+  </header>
+
+  <div class="notice manage-only block" id="manageNotice">
+    관리 모드: 수정 내용은 이 브라우저에만 임시 저장됩니다(암호화 상태). 사이트에 반영하려면
+    [암호화된 index.html 받기] → GitHub 저장소에 업로드하세요.
+  </div>
+
+  <div class="toolbar">
+    <input type="search" id="q" placeholder="이름·설명·주소 검색">
+    <select id="fCat"><option value="">전체 분류</option></select>
+    <select id="fStatus"><option value="">전체 상태</option></select>
+    <div class="seg" id="viewSeg">
+      <button data-view="card" class="on">카드</button>
+      <button data-view="table">표</button>
+    </div>
+    <span class="spacer"></span>
+    <button class="manage-only primary" id="btnAdd">+ 앱 추가</button>
+    <button class="manage-only" id="btnCheck">연결 확인</button>
+    <button class="manage-only primary" id="btnBuild">암호화된 index.html 받기</button>
+    <button class="manage-only" id="btnPw">비밀번호 변경</button>
+    <button class="manage-only" id="btnExport">JSON 내보내기</button>
+    <button class="manage-only" id="btnImport">JSON 가져오기</button>
+    <button class="manage-only danger" id="btnReset">임시 수정 취소</button>
+    <button id="btnManage" title="관리 모드">⚙︎ 관리</button>
+    <button id="btnLock" title="잠그고 이 기기에서 비밀번호 잊기">🔒 잠금</button>
+  </div>
+
+  <div id="list"></div>
+  <footer>© <span id="yr"></span> activewith.net</footer>
+</div>
+
+<dialog id="dlg">
+  <form method="dialog" id="form">
+    <div class="dlg-head" id="dlgTitle">앱 추가</div>
+    <div class="dlg-body">
+      <label>이름 *<input name="name" required=""></label>
+      <label>아이콘 (이모지)<input name="icon" maxlength="4" placeholder="📊"></label>
+      <label class="full">주소 (URL)<input name="url" type="url" placeholder="https://이름.activewith.net"></label>
+      <label class="full">설명<textarea name="desc" rows="2"></textarea></label>
+      <label>분류<input name="category" list="catList" placeholder="업무 도구 / 게임 …"></label>
+      <label>상태
+        <select name="status"><option>운영중</option><option>개발중</option><option>중지</option></select>
+      </label>
+      <label>호스팅<input name="host" list="hostList" placeholder="Netlify / Vercel / GitHub Pages / NAS"></label>
+      <label>CNAME 대상<input name="cname" placeholder="xxx.netlify.app"></label>
+      <label>최근 수정일<input name="updated" type="date"></label>
+      <label>태그 (쉼표 구분)<input name="tags" placeholder="입찰, 계산기"></label>
+      <label class="full">메모 (관리용)<textarea name="memo" rows="2"></textarea></label>
+      <label class="check full"><input type="checkbox" name="hidden"> 공개 목록에서 숨김 (페이지 소스에는 남음)</label>
+    </div>
+    <div class="dlg-foot">
+      <button type="button" class="danger" id="btnDelete">삭제</button>
+      <span class="spacer"></span>
+      <button value="cancel" formnovalidate="">취소</button>
+      <button value="save" class="primary">저장</button>
+    </div>
+  </form>
+</dialog>
+<datalist id="catList"></datalist>
+<datalist id="hostList"><option>Netlify</option><option>Vercel</option><option>GitHub Pages</option><option>Cloudflare Pages</option><option>회사 NAS</option><option>Claude 아티팩트</option></datalist>
+<input type="file" id="fileIn" accept="application/json" hidden="">
+
+<script>
+/* ============================================================
+   activewith.net 허브 — 암호화 버전
+   - ENC: 앱 목록을 비밀번호로 암호화한 데이터 (PBKDF2-SHA256 → AES-256-GCM)
+   - SEED: 최초 설정용 평문 목록. 암호화된 파일을 만들면 자동으로 비워집니다.
+     SEED가 채워진 파일은 절대 업로드하지 마세요.
+   ============================================================ */
+const ENC = /*ENC*/{"v":1,"iter":600000,"salt":"LrloZ0FxjufWNSWm36webg==","iv":"JXdxkhMTceGcXrov","ct":"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"}/*END*/;
+const SEED = /*SEED*/[]/*END*/;
+const TEMPLATE = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+
+const ITER = 600000;
+const LS_KEY = "aw_key_v2", LS_DRAFT = "aw_draft_v2", LS_VIEW = "aw_view_v1";
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const store = {
+  get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } },
+  set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} },
+  del(k){ try{ localStorage.removeItem(k); }catch(e){} }
+};
+const te = new TextEncoder(), td = new TextDecoder();
+const b64 = buf => btoa(String.fromCharCode(...new Uint8Array(buf)));
+const unb64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+
+/* ---------- 암호화 ---------- */
+let cryptoKey = null, salt = null;
+async function deriveKey(password, saltBytes, iter){
+  const base = await crypto.subtle.importKey("raw", te.encode(password), "PBKDF2", false, ["deriveKey"]);
+  return crypto.subtle.deriveKey({name:"PBKDF2", salt:saltBytes, iterations:iter, hash:"SHA-256"},
+    base, {name:"AES-GCM", length:256}, true, ["encrypt","decrypt"]);
+}
+async function encryptJSON(obj, key){
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = await crypto.subtle.encrypt({name:"AES-GCM", iv}, key, te.encode(JSON.stringify(obj)));
+  return {iv:b64(iv), ct:b64(ct)};
+}
+async function decryptJSON(pack, key){
+  const pt = await crypto.subtle.decrypt({name:"AES-GCM", iv:unb64(pack.iv)}, key, unb64(pack.ct));
+  return JSON.parse(td.decode(pt));
+}
+async function rememberKey(key){
+  const raw = await crypto.subtle.exportKey("raw", key);
+  store.set(LS_KEY, JSON.stringify({salt:b64(salt), k:b64(raw)}));
+}
+async function loadRememberedKey(){
+  try{
+    const r = JSON.parse(store.get(LS_KEY) || "null");
+    if (!r || !ENC || r.salt !== ENC.salt) return null;
+    return crypto.subtle.importKey("raw", unb64(r.k), {name:"AES-GCM"}, true, ["encrypt","decrypt"]);
+  }catch(e){ return null; }
+}
+
+/* ---------- 잠금 화면 ---------- */
+function gateUnlock(msg){
+  $("#gateBox").innerHTML = `
+    <h2>activewith.net</h2>
+    <p>비밀번호를 입력하세요.</p>
+    <input type="password" id="pw" autocomplete="current-password" autofocus>
+    <label class="row"><input type="checkbox" id="remember" checked> 이 기기에서 기억하기</label>
+    <div class="err" id="err">${esc(msg||"")}</div>
+    <button class="primary" id="go">열기</button>`;
+  const submit = async () => {
+    const pw = $("#pw").value; if (!pw) return;
+    $("#go").disabled = true; $("#err").textContent = "확인 중…";
+    try{
+      salt = unb64(ENC.salt);
+      const key = await deriveKey(pw, salt, ENC.iter);
+      const data = await decryptJSON(ENC, key);
+      cryptoKey = key;
+      if ($("#remember").checked) await rememberKey(key);
+      await openHub(data);
+    }catch(e){
+      $("#err").textContent = "비밀번호가 맞지 않습니다."; $("#go").disabled = false; $("#pw").select();
+    }
+  };
+  $("#go").onclick = submit;
+  $("#pw").onkeydown = e => { if (e.key === "Enter") submit(); };
+  $("#pw").focus();
+}
+
+function gateSetup(){
+  $("#gateBox").innerHTML = `
+    <h2>최초 설정</h2>
+    <p>이 파일은 <b>평문 목록이 들어 있는 설정용 파일</b>입니다. 업로드하지 마세요.
+       비밀번호를 정하면 암호화된 <span class="mono">index.html</span>이 다운로드됩니다. 그 파일만 GitHub에 올리세요.</p>
+    <input type="password" id="pw1" placeholder="새 비밀번호 (12자 이상)" autocomplete="new-password">
+    <input type="password" id="pw2" placeholder="비밀번호 확인" autocomplete="new-password">
+    <div class="err" id="err"></div>
+    <button class="primary" id="go">암호화된 index.html 만들기</button>`;
+  $("#go").onclick = async () => {
+    const a = $("#pw1").value, b = $("#pw2").value;
+    if (a.length < 12) return $("#err").textContent = "12자 이상으로 정하세요. 짧으면 대입 공격에 뚫릴 수 있습니다.";
+    if (a !== b) return $("#err").textContent = "두 비밀번호가 다릅니다.";
+    $("#go").disabled = true; $("#err").textContent = "암호화 중…";
+    salt = crypto.getRandomValues(new Uint8Array(16));
+    cryptoKey = await deriveKey(a, salt, ITER);
+    await downloadEncrypted(SEED);
+    $("#gateBox").innerHTML = `<h2>완료</h2>
+      <p>다운로드된 <span class="mono">index.html</span>을 GitHub 저장소(activewith.github.io)에 업로드하세요.</p>
+      <p>이 설정용 파일은 업로드하지 말고 삭제하세요.</p>`;
+  };
+}
+
+/* ---------- 파일 생성 ---------- */
+function marker(name){ return new RegExp("/\\*" + name + "\\*/[\\s\\S]*?/\\*END\\*/"); }
+async function downloadEncrypted(list){
+  const pack = await encryptJSON(list, cryptoKey);
+  const enc = {v:1, iter:ITER, salt:b64(salt), iv:pack.iv, ct:pack.ct};
+  let html = TEMPLATE
+    .replace(marker("ENC"), () => "/*ENC*/" + JSON.stringify(enc) + "/*END*/")
+    .replace(marker("SEED"), () => "/*SEED*/[]/*END*/");
+  html = html.replace(/<body[^>]*>/, '<body class="locked">');
+  const b = new Blob([html], {type:"text/html"});
+  const u = URL.createObjectURL(b), l = document.createElement("a");
+  l.href = u; l.download = "index.html"; document.body.appendChild(l); l.click(); l.remove();
+  setTimeout(()=>URL.revokeObjectURL(u), 2000);
+}
+
+/* ---------- 허브 ---------- */
+let apps = [], view = store.get(LS_VIEW) || "card", manage = false;
+let sortKey = "name", sortDir = 1, editingId = null;
+const health = {};
+
+async function openHub(data){
+  apps = data;
+  const d = store.get(LS_DRAFT);
+  if (d){ try{ apps = await decryptJSON(JSON.parse(d), cryptoKey); }catch(e){ store.del(LS_DRAFT); } }
+  document.body.classList.remove("locked");
+  $("#gate").style.display = "none";
+  render();
+}
+async function saveApps(){ store.set(LS_DRAFT, JSON.stringify(await encryptJSON(apps, cryptoKey))); }
+function statusOf(a){ return a.url ? (a.status || "운영중") : "주소미입력"; }
+function hostOf(url){ try{ return new URL(url).host; }catch(e){ return url || ""; } }
+
+function filtered(){
+  const q = $("#q").value.trim().toLowerCase();
+  const c = $("#fCat").value, s = $("#fStatus").value;
+  return apps.filter(a => {
+    if (!manage && a.hidden) return false;
+    if (c && a.category !== c) return false;
+    if (s && statusOf(a) !== s) return false;
+    if (!q) return true;
+    return [a.name,a.desc,a.url,a.category,a.host,a.cname,(a.tags||[]).join(" "),manage?a.memo:""].join(" ").toLowerCase().includes(q);
+  });
+}
+function refreshFilters(){
+  const visible = apps.filter(a => manage || !a.hidden);
+  const cats = [...new Set(visible.map(a => a.category).filter(Boolean))].sort();
+  const sts = [...new Set(visible.map(statusOf))];
+  const fill = (sel, items, label) => {
+    const cur = sel.value;
+    sel.innerHTML = `<option value="">${label}</option>` + items.map(i => `<option${i===cur?" selected":""}>${esc(i)}</option>`).join("");
+  };
+  fill($("#fCat"), cats, "전체 분류"); fill($("#fStatus"), sts, "전체 상태");
+  $("#catList").innerHTML = cats.map(c => `<option>${esc(c)}</option>`).join("");
+  const live = visible.filter(a => statusOf(a) === "운영중").length;
+  $("#stats").innerHTML = `<div class="stat"><b>${visible.length}</b><span>전체</span></div><div class="stat"><b>${live}</b><span>운영중</span></div>` +
+    cats.map(c => `<div class="stat"><b>${visible.filter(a=>a.category===c).length}</b><span>${esc(c)}</span></div>`).join("");
+}
+function healthLabel(id){
+  const h = health[id]; if (!h) return "";
+  if (h === "checking") return `<span class="health">확인 중…</span>`;
+  return h === "up" ? `<span class="health up">● 응답함</span>` : `<span class="health down">● 응답 없음</span>`;
+}
+function renderCards(list){
+  return `<div class="grid">` + list.map(a => {
+    const st = statusOf(a);
+    return `<div class="card${a.hidden?" hidden-app":""}">
+      <div class="card-top"><div class="icon">${esc(a.icon || "🔗")}</div>
+        <div style="min-width:0"><h3>${esc(a.name)}</h3><div class="url">${a.url ? esc(hostOf(a.url)) : "주소 미입력"}</div></div></div>
+      <p class="desc">${esc(a.desc)}</p>
+      <div class="chips"><span class="chip st-${esc(st)}">${st==="주소미입력"?"주소 미입력":esc(st)}</span>
+        ${a.category?`<span class="chip">${esc(a.category)}</span>`:""}
+        ${(a.tags||[]).map(t=>`<span class="chip">#${esc(t)}</span>`).join("")}
+        ${manage && a.hidden?`<span class="chip">숨김</span>`:""}</div>
+      ${manage && (a.host||a.cname||a.memo) ? `<div class="url">${esc(a.host||"")}${a.cname?` → <span class="mono">${esc(a.cname)}</span>`:""}${a.memo?`<br>📝 ${esc(a.memo)}`:""}</div>`:""}
+      <div class="card-actions"><a class="go${a.url?"":" disabled"}" href="${esc(a.url||"#")}" target="_blank" rel="noopener">열기</a>
+        ${manage?`<button data-edit="${esc(a.id)}">수정</button>`:""}</div>
+      ${manage?healthLabel(a.id):""}</div>`;
+  }).join("") + `</div>`;
+}
+function renderTable(list){
+  const cols = [["name","이름"],["url","주소"],["category","분류"],["status","상태"],["host","호스팅"],["cname","CNAME 대상"],["updated","수정일"]];
+  if (manage) cols.push(["memo","메모"]);
+  const val = (a,k) => k==="status" ? statusOf(a) : (a[k]||"");
+  const rows = [...list].sort((x,y) => String(val(x,sortKey)).localeCompare(String(val(y,sortKey)),"ko") * sortDir);
+  const head = cols.map(([k,l]) => `<th data-sort="${k}" class="${k===sortKey?"sorted":""}" data-dir="${sortDir>0?"▲":"▼"}">${l}</th>`).join("") + (manage?"<th></th><th></th>":"");
+  const body = rows.map(a => `<tr>
+    <td>${esc(a.icon||"🔗")} <b>${esc(a.name)}</b>${a.hidden?' <span class="chip">숨김</span>':""}</td>
+    <td>${a.url?`<a href="${esc(a.url)}" target="_blank" rel="noopener">${esc(hostOf(a.url))}</a>`:'<span class="chip st-주소미입력">미입력</span>'}</td>
+    <td>${esc(a.category)}</td><td><span class="chip st-${esc(statusOf(a))}">${esc(statusOf(a)==="주소미입력"?"주소 미입력":statusOf(a))}</span></td>
+    <td>${esc(a.host)}</td><td class="mono">${esc(a.cname)}</td><td>${esc(a.updated)}</td>
+    ${manage?`<td class="wrapcell">${esc(a.memo)}</td><td>${healthLabel(a.id)}</td><td><button data-edit="${esc(a.id)}">수정</button></td>`:""}</tr>`).join("");
+  return `<div class="table-wrap"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
+}
+function render(){
+  document.body.classList.toggle("manage", manage);
+  $("#btnManage").textContent = manage ? "✓ 관리 종료" : "⚙︎ 관리";
+  document.querySelectorAll("#viewSeg button").forEach(b => b.classList.toggle("on", b.dataset.view === view));
+  refreshFilters();
+  const list = filtered();
+  $("#list").innerHTML = list.length ? (view==="table" ? renderTable(list) : renderCards(list))
+    : `<div class="empty">${apps.length ? "조건에 맞는 앱이 없습니다." : "등록된 앱이 없습니다. 관리 모드에서 추가하세요."}</div>`;
+}
+
+/* ---------- 편집 ---------- */
+const FIELDS = ["name","icon","url","desc","category","status","host","cname","updated","memo"];
+function openEditor(id){
+  editingId = id;
+  const a = id ? apps.find(x => x.id === id) : {status:"운영중", updated:new Date().toISOString().slice(0,10)};
+  const f = $("#form");
+  $("#dlgTitle").textContent = id ? "앱 수정" : "앱 추가";
+  $("#btnDelete").style.visibility = id ? "visible" : "hidden";
+  for (const k of FIELDS) f.elements[k].value = a[k] || "";
+  f.elements.tags.value = (a.tags||[]).join(", ");
+  f.elements.hidden.checked = !!a.hidden;
+  $("#dlg").showModal();
+}
+$("#dlg").addEventListener("close", async () => {
+  if ($("#dlg").returnValue !== "save") return;
+  const f = $("#form"), d = {};
+  for (const k of FIELDS) d[k] = f.elements[k].value.trim();
+  d.tags = f.elements.tags.value.split(",").map(s=>s.trim()).filter(Boolean);
+  d.hidden = f.elements.hidden.checked;
+  if (editingId) Object.assign(apps.find(x=>x.id===editingId), d);
+  else {
+    const base = d.name.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"") || "app";
+    let id = base, n = 2; while (apps.some(x=>x.id===id)) id = `${base}-${n++}`;
+    apps.push({id, ...d});
+  }
+  await saveApps(); render();
+});
+$("#btnDelete").onclick = async () => {
+  if (!editingId) return;
+  apps = apps.filter(x=>x.id!==editingId);
+  await saveApps(); $("#dlg").close(); render();
+};
+
+/* ---------- 연결 확인 ---------- */
+async function checkAll(){
+  const targets = apps.filter(a => a.url);
+  targets.forEach(a => health[a.id] = "checking"); render();
+  await Promise.all(targets.map(async a => {
+    const ctl = new AbortController(); const t = setTimeout(()=>ctl.abort(), 8000);
+    try{ await fetch(a.url, {mode:"no-cors", cache:"no-store", signal:ctl.signal}); health[a.id] = "up"; }
+    catch(e){ health[a.id] = "down"; } finally{ clearTimeout(t); }
+  }));
+  render();
+}
+
+/* ---------- 관리 기능 ---------- */
+$("#btnBuild").onclick = async () => { await downloadEncrypted(apps); store.del(LS_DRAFT); };
+$("#btnPw").onclick = () => {
+  $("#gate").style.display = "grid";
+  $("#gateBox").innerHTML = `<h2>비밀번호 변경</h2>
+    <p>새 비밀번호로 암호화된 index.html이 다운로드됩니다. 업로드해야 반영됩니다.</p>
+    <input type="password" id="pw1" placeholder="새 비밀번호 (12자 이상)" autocomplete="new-password">
+    <input type="password" id="pw2" placeholder="비밀번호 확인" autocomplete="new-password">
+    <div class="err" id="err"></div>
+    <button class="primary" id="go">변경하고 받기</button><button id="cancel">취소</button>`;
+  $("#cancel").onclick = () => $("#gate").style.display = "none";
+  $("#go").onclick = async () => {
+    const a = $("#pw1").value, b = $("#pw2").value;
+    if (a.length < 12) return $("#err").textContent = "12자 이상으로 정하세요.";
+    if (a !== b) return $("#err").textContent = "두 비밀번호가 다릅니다.";
+    $("#go").disabled = true; $("#err").textContent = "암호화 중…";
+    salt = crypto.getRandomValues(new Uint8Array(16));
+    cryptoKey = await deriveKey(a, salt, ITER);
+    await downloadEncrypted(apps);
+    store.del(LS_KEY); store.del(LS_DRAFT);
+    $("#gate").style.display = "none";
+  };
+};
+$("#btnLock").onclick = () => { store.del(LS_KEY); store.del(LS_DRAFT); location.reload(); };
+function download(name, text, type){
+  const b = new Blob([text], {type}); const u = URL.createObjectURL(b), l = document.createElement("a");
+  l.href = u; l.download = name; l.click(); setTimeout(()=>URL.revokeObjectURL(u), 1000);
+}
+$("#btnExport").onclick = () => download(`activewith-apps-${new Date().toISOString().slice(0,10)}.json`, JSON.stringify(apps, null, 2), "application/json");
+$("#btnImport").onclick = () => $("#fileIn").click();
+$("#fileIn").onchange = async e => {
+  const file = e.target.files[0]; if (!file) return;
+  try{ const a = JSON.parse(await file.text()); if (!Array.isArray(a)) throw 0;
+    apps = a.map((x,i) => ({id: x.id || `app-${i}`, ...x})); await saveApps(); render();
+  }catch(err){ $("#list").insertAdjacentHTML("afterbegin", `<div class="notice">JSON 형식이 올바르지 않습니다.</div>`); }
+  e.target.value = "";
+};
+$("#btnReset").onclick = async () => {
+  store.del(LS_DRAFT);
+  apps = await decryptJSON(ENC, cryptoKey); render();
+};
+$("#btnManage").onclick = () => { manage = !manage; render(); };
+$("#btnAdd").onclick = () => openEditor(null);
+$("#btnCheck").onclick = checkAll;
+["#q","#fCat","#fStatus"].forEach(s => $(s).addEventListener("input", render));
+$("#viewSeg").onclick = e => { const v = e.target.dataset.view; if (v){ view = v; store.set(LS_VIEW, v); render(); } };
+$("#list").addEventListener("click", e => {
+  const ed = e.target.closest("[data-edit]"); if (ed) return openEditor(ed.dataset.edit);
+  const th = e.target.closest("th[data-sort]");
+  if (th){ const k = th.dataset.sort; sortDir = (k===sortKey) ? -sortDir : 1; sortKey = k; render(); }
+});
+$("#yr").textContent = new Date().getFullYear();
+
+/* ---------- 시작 ---------- */
+(async () => {
+  if (!window.crypto || !crypto.subtle){
+    $("#gateBox").innerHTML = "<h2>열 수 없음</h2><p>HTTPS 주소(https://activewith.net)로 접속하세요.</p>"; return;
+  }
+  if (!ENC){ return SEED.length ? gateSetup() : ($("#gateBox").innerHTML = "<h2>데이터 없음</h2>"); }
+  const k = await loadRememberedKey();
+  if (k){
+    try{ salt = unb64(ENC.salt); const data = await decryptJSON(ENC, k); cryptoKey = k; return openHub(data); }
+    catch(e){ store.del(LS_KEY); }
+  }
+  gateUnlock();
+})();
+</script></body></html>
